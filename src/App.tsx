@@ -276,9 +276,30 @@ export default function App() {
   const exportComparison = () => {
     if (!comparisonA || !comparisonB || compareGameA === compareGameB) return
     const csvCell = (value: unknown) => '"' + String(value ?? '').replace(/"/g, '""') + '"'
-    const lines = [
-      ['Confronto storico', active?.name || '', 'Partita iniziale', comparisonA.date, comparisonA.opponent, comparisonA.result],
+    const signed = (value: number) => (value > 0 ? '+' : '') + value
+    const metricRows = [
+      ['Metrica', 'Partita iniziale', 'Partita successiva', 'Delta'],
+      ['Eroi', comparisonMetrics.heroesBefore, comparisonMetrics.heroesAfter, signed(comparisonMetrics.heroesDelta)],
+      ['Truppa e specialisti', comparisonMetrics.troopsBefore, comparisonMetrics.troopsAfter, signed(comparisonMetrics.troopsDelta)],
+      ['Roster totale', comparisonMetrics.rosterBefore, comparisonMetrics.rosterAfter, signed(comparisonMetrics.rosterDelta)],
+      ['PE dei guerrieri presenti in entrambe', '', '', signed(comparisonMetrics.xpDelta)],
+      ['Ferite dei guerrieri presenti in entrambe', '', '', signed(comparisonMetrics.woundsDelta)],
+      ['Guerrieri con cambio di stato', '', '', comparisonMetrics.statusChanges],
+      ['Guerrieri con cambio equipaggiamento', '', '', comparisonMetrics.equipmentChanges],
+      ['Valore banda', comparisonA.bandRatingAtMatch ?? 'n.d.', comparisonB.bandRatingAtMatch ?? 'n.d.', comparisonMetrics.bandRatingDelta === null ? 'n.d.' : signed(comparisonMetrics.bandRatingDelta)],
+      ['Valore banda avversaria', comparisonA.opponentRating ?? 'n.d.', comparisonB.opponentRating ?? 'n.d.', comparisonMetrics.opponentRatingDelta === null ? 'n.d.' : signed(comparisonMetrics.opponentRatingDelta)]
+    ]
+    const lines: unknown[][] = [
+      ['Confronto storico', active?.name || ''],
+      ['Partita iniziale', comparisonA.date, comparisonA.opponent, comparisonA.result],
       ['Partita successiva', comparisonB.date, comparisonB.opponent, comparisonB.result],
+      [],
+      ...metricRows,
+      [],
+      ['Riepilogo variazioni', 'Numero'],
+      ['Ingressi', comparisonSummary.joined],
+      ['Uscite', comparisonSummary.left],
+      ['Modifiche individuali', comparisonSummary.changed],
       [],
       ['Guerriero', 'Variazione', 'Dettagli'],
       ...comparisonRows.map(row => [row.name, row.kind, row.details])
