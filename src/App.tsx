@@ -95,7 +95,7 @@ export default function App() {
     const roster=g.warriorSnapshot||[]
     const previous=index>0?all[index-1]:undefined
     const count=(types:string[])=>roster.filter(w=>types.includes(w.type)).length
-    return {id:g.id,date:g.date,opponent:g.opponent,result:g.result,rating:g.bandRatingAtMatch,opponentRating:g.opponentRating,roster:roster.length,heroes:count(['Capitano','Eroe']),troops:count(['Truppa']),shooters:count(['Tiratore']),specialists:count(['Specialista']),xp:roster.reduce((sum,w)=>sum+w.xp,0),ratingDelta:g.bandRatingAtMatch!==undefined&&previous?.bandRatingAtMatch!==undefined?g.bandRatingAtMatch-previous.bandRatingAtMatch:null,rosterDelta:roster.length-(previous?.warriorSnapshot?.length??roster.length),xpDelta:previous?.warriorSnapshot?roster.reduce((sum,w)=>sum+(w.xp-(previous.warriorSnapshot!.find(old=>old.id===w.id)?.xp??0)),0):null}
+    return {id:g.id,date:g.date,opponent:g.opponent,result:g.result,rating:g.bandRatingAtMatch,opponentRating:g.opponentRating,roster:roster.length,heroes:count(['Capitano','Eroe']),troops:count(['Truppa']),shooters:count(['Tiratore']),specialists:count(['Specialista']),xp:roster.reduce((sum,w)=>sum+w.xp,0),ratingDelta:g.bandRatingAtMatch!==undefined&&previous?.bandRatingAtMatch!==undefined?g.bandRatingAtMatch-previous.bandRatingAtMatch:null,rosterDelta:roster.length-(previous?.warriorSnapshot?.length??roster.length),xpDelta:previous?.warriorSnapshot?roster.reduce((sum,w)=>sum+w.xp,0)-previous.warriorSnapshot.reduce((sum,w)=>sum+w.xp,0):null}
   }) : []
   const timelineMaxRating=Math.max(1,...campaignTimeline.map(g=>g.rating??0))
   const comparisonA = comparisonGames.find(g=>g.id===compareGameA)
