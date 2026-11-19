@@ -320,8 +320,8 @@ export default function App() {
       ['Guerriero', 'Variazione', 'Dettagli'],
       ...comparisonRows.map(row => [row.name, row.kind, row.details]),
       [],
-      ['Progressione individuale', 'PE iniziali', 'PE successivi', 'Delta PE', 'Ferite iniziali', 'Ferite successive', 'Delta ferite', 'Stato iniziale', 'Stato successivo', 'Equipaggiamento modificato'],
-      ...comparisonProgression.map(w => [w.name,w.xpBefore,w.xpAfter,signed(w.xpDelta),w.woundsBefore,w.woundsAfter,signed(w.woundsDelta),w.statusBefore,w.statusAfter,w.equipmentChanged?'Sì':'No'])
+      ['Progressione individuale', 'PE iniziali', 'PE successivi', 'Delta PE', 'Ferite iniziali', 'Ferite successive', 'Delta ferite', 'Stato iniziale', 'Stato successivo', 'Equipaggiamento modificato', 'Equipaggiamento iniziale', 'Equipaggiamento successivo'],
+      ...comparisonProgression.map(w => [w.name,w.xpBefore,w.xpAfter,signed(w.xpDelta),w.woundsBefore,w.woundsAfter,signed(w.woundsDelta),w.statusBefore,w.statusAfter,w.equipmentChanged?'Sì':'No',(w.equipmentBefore.join(', ')||'nessuno'),(w.equipmentAfter.join(', ')||'nessuno')])
     ]
     const csv = '\uFEFF' + lines.map(line => line.map(csvCell).join(';')).join('\r\n')
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
