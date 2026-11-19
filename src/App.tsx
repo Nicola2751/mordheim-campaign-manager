@@ -5,7 +5,7 @@ type Warrior = { id: string; name: string; type: string; xp: number; wounds: num
 type Warband = { id: string; name: string; faction: string; gold: number; rating: number; warriors: Warrior[]; stash?: string[]; wyrdstone?: number }
 type Exploration = { id: string; date: string; bandName: string; dice: number[]; total: number; stones: number; victoryBonus: boolean }
 type MarketSearch = { id:string; date:string; bandId:string; heroName:string; itemName:string; roll:number; rarity:number; success:boolean }
-type Campaign = { bands: Warband[]; games: { id: string; date: string; opponent: string; result: string; notes: string; bandId?: string; xpBonus?: number }[]; chronicle: string[]; explorations: Exploration[]; marketSearches: MarketSearch[] }
+type Campaign = { bands: Warband[]; games: { id: string; date: string; opponent: string; result: string; notes: string; bandId?: string; xpBonus?: number; xpAwarded?: boolean }[]; chronicle: string[]; explorations: Exploration[]; marketSearches: MarketSearch[] }
 const starter: Campaign = { bands: [], games: [], chronicle: [], explorations: [], marketSearches: [] }
 const uid = () => Math.random().toString(36).slice(2, 10)
 const read = (): Campaign => { try { const saved = JSON.parse(localStorage.getItem('mordheim-ledger') || 'null'); return saved ? { ...starter, ...saved, explorations: saved.explorations || [], marketSearches: saved.marketSearches || [] } : starter } catch { return starter } }
@@ -141,14 +141,16 @@ export default function App() {
   const underdogBonus = (difference:number) => difference<=50?0:difference<=75?1:difference<=100?2:difference<=150?3:difference<=300?4:5
   const applyPostGameExperience = () => {
     if (!active) { setPostGameMessage('Seleziona prima la banda.'); return }
-    const diff = Math.max(0,Number(opponentRating)-active.rating)
-    const bonus = underdogBonus(diff)
+    const game = data.games.find(g=>g.bandId===active.id)
+    if (!game) { setPostGameMessage('Registra prima la partita di questa banda.'); return }
+    if (game.xpAwarded) { setPostGameMessage('I PE per l’ultima partita registrata sono già stati assegnati.'); return }
+    const bonus = game.xpBonus ?? 0
     const eligible = active.warriors.filter(w=>w.status!=='Fuori combattimento')
     if (!eligible.length) { setPostGameMessage('Nessun guerriero sopravvissuto disponibile per ricevere PE.'); return }
-    patchBand(active.id,{warriors:active.warriors.map(w=>w.status!=='Fuori combattimento'?{...w,xp:w.xp+1+bonus}:w)})
+    setData(d=>({...d,bands:d.bands.map(b=>b.id===active.id?{...b,warriors:b.warriors.map(w=>w.status!=='Fuori combattimento'?{...w,xp:w.xp+1+bonus}:w)}:b),games:d.games.map(g=>g.id===game.id?{...g,xpAwarded:true}:g)}))
     setPostGameMessage('Assegnati '+(1+bonus)+' PE a '+eligible.length+' guerrieri sopravvissuti (1 PE sopravvivenza + '+bonus+' bonus svantaggio).')
   }
-  const addGame = () => { if(!opponent.trim()) return; setData(d=>({...d,games:[{id:uid(),date:new Date().toLocaleDateString('it-IT'),opponent,result,notes,bandId:active?.id,xpBonus:underdogBonus(Math.max(0,Number(opponentRating)-(active?.rating||0)))},...d.games]})); setOpponent('');setNotes('') }
+  const addGame = () => { if(!opponent.trim()) return; setData(d=>({...d,games:[{id:uid(),date:new Date().toLocaleDateString('it-IT'),opponent,result,notes,bandId:active?.id,xpAwarded:false,xpBonus:underdogBonus(Math.max(0,Number(opponentRating)-(active?.rating||0)))},...d.games]})); setOpponent('');setNotes('') }
   const addChronicle = () => { if(chronicle.trim()) {setData(d=>({...d,chronicle:[chronicle.trim(),...d.chronicle]}));setChronicle('')} }
   return <div className="shell">
     <aside className="sidebar"><div className="sigil">M</div><div className="brand"><span>IL REGISTRO DI</span><strong>MORDHEIM</strong><small>CAMPAIGN LEDGER</small></div><nav>{[['bande','♜','Le bande'],['armeria','⚒','Armeria'],['partite','⚔','Partite'],['esplorazione','☠','Esplorazione'],['cronaca','✒','Cronaca']].map(([id,ic,label])=><button key={id} className={tab===id?'active':''} onClick={()=>setTab(id)}><span>{ic}</span>{label}</button>)}</nav><div className="side-bottom"><span className="dot"/> CAMPAGNA LOCALE<br/><small>I dati restano su questo dispositivo</small></div></aside>
