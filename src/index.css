@@ -3,3 +3,5 @@
 .assigned-equipment{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:5px}.assigned-equipment>small{color:#b39a75;max-width:100%}.assigned-equipment select{max-width:170px;padding:6px;font-size:10px}.assigned-equipment .outline{padding:6px 9px;font-size:9px}.assigned-equipment .remove{font-size:15px;padding:0 3px}.warrior-info{min-width:0}.warrior-info small{overflow-wrap:anywhere}
 
 .rating-input{width:76px;padding:5px 7px;margin-left:5px}.xp-control{display:flex;align-items:center;gap:4px;font-size:9px;color:#958875}.xp-control input{width:58px;padding:5px}.post-game-tools{margin:22px 0;padding:18px;border:1px solid #493a28;background:#191611}.post-game-tools h3{margin:0 0 8px}.post-game-tools .primary:disabled{opacity:.45;cursor:not-allowed}
+
+.market-hero-label{display:flex;align-items:center;gap:10px;margin:12px 0;color:#aa987c;font-size:10px;letter-spacing:1px}.market-hero-label select{min-width:190px}.stone-inventory{margin-top:22px;padding:17px;border:1px solid #493a28;background:#191611}.stone-inventory h3{margin:0 0 7px}.stone-sale{display:flex;gap:8px;flex-wrap:wrap}.stone-sale input{width:120px}.stone-sale button{white-space:nowrap}
