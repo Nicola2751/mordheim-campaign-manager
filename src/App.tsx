@@ -4,7 +4,8 @@ import { equipment } from './data/equipment'
 type Warrior = { id: string; name: string; type: string; xp: number; wounds: number; status: string; equipment?: string[] }
 type Warband = { id: string; name: string; faction: string; gold: number; rating: number; warriors: Warrior[]; stash?: string[] }
 type Exploration = { id: string; date: string; bandName: string; dice: number[]; total: number; stones: number; victoryBonus: boolean }
-type MarketSearch = { id:string; date:string; bandId:string; heroName:string; itemName:string; roll:number; rarity:number; success:boolean }\ntype Campaign = { bands: Warband[]; games: { id: string; date: string; opponent: string; result: string; notes: string; bandId?: string; xpBonus?: number }[]; chronicle: string[]; explorations: Exploration[]; marketSearches: MarketSearch[] }
+type MarketSearch = { id:string; date:string; bandId:string; heroName:string; itemName:string; roll:number; rarity:number; success:boolean }
+type Campaign = { bands: Warband[]; games: { id: string; date: string; opponent: string; result: string; notes: string; bandId?: string; xpBonus?: number }[]; chronicle: string[]; explorations: Exploration[]; marketSearches: MarketSearch[] }
 const starter: Campaign = { bands: [], games: [], chronicle: [], explorations: [], marketSearches: [] }
 const uid = () => Math.random().toString(36).slice(2, 10)
 const read = (): Campaign => { try { const saved = JSON.parse(localStorage.getItem('mordheim-ledger') || 'null'); return saved ? { ...starter, ...saved, explorations: saved.explorations || [], marketSearches: saved.marketSearches || [] } : starter } catch { return starter } }
@@ -29,7 +30,9 @@ export default function App() {
   const [marketMessage, setMarketMessage] = useState('')
   const [explorationVictory, setExplorationVictory] = useState(false)
   const [explorationMessage, setExplorationMessage] = useState('')
-  const [equipmentSelection, setEquipmentSelection] = useState<Record<string,string>>({})\n  const [marketHero, setMarketHero] = useState('')\n  const [marketSearchMessage, setMarketSearchMessage] = useState('')
+  const [equipmentSelection, setEquipmentSelection] = useState<Record<string,string>>({})
+  const [marketHero, setMarketHero] = useState('')
+  const [marketSearchMessage, setMarketSearchMessage] = useState('')
   useEffect(() => localStorage.setItem('mordheim-ledger', JSON.stringify(data)), [data])
   const active = data.bands.find(b => b.id === selected) || data.bands[0]
   const totalWarriors = useMemo(() => data.bands.reduce((n,b) => n + b.warriors.length, 0), [data])
