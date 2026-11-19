@@ -3,7 +3,8 @@ import { equipment } from './data/equipment'
 
 type Warrior = { id: string; name: string; type: string; xp: number; wounds: number; status: string }
 type Warband = { id: string; name: string; faction: string; gold: number; rating: number; warriors: Warrior[]; stash?: string[] }
-type Exploration = { id: string; date: string; bandName: string; dice: number[]; total: number; stones: number; victoryBonus: boolean }\ntype Campaign = { bands: Warband[]; games: { id: string; date: string; opponent: string; result: string; notes: string }[]; chronicle: string[]; explorations: Exploration[] }
+type Exploration = { id: string; date: string; bandName: string; dice: number[]; total: number; stones: number; victoryBonus: boolean }
+type Campaign = { bands: Warband[]; games: { id: string; date: string; opponent: string; result: string; notes: string }[]; chronicle: string[]; explorations: Exploration[] }
 const starter: Campaign = { bands: [], games: [], chronicle: [], explorations: [] }
 const uid = () => Math.random().toString(36).slice(2, 10)
 const read = (): Campaign => { try { const saved = JSON.parse(localStorage.getItem('mordheim-ledger') || 'null'); return saved ? { ...starter, ...saved, explorations: saved.explorations || [] } : starter } catch { return starter } }
@@ -23,7 +24,9 @@ export default function App() {
   const [chronicle, setChronicle] = useState('')
   const [dice, setDice] = useState<number[]>([])
   const [equipmentCategory, setEquipmentCategory] = useState('Tutte')
-  const [marketMessage, setMarketMessage] = useState('')\n  const [explorationVictory, setExplorationVictory] = useState(false)\n  const [explorationMessage, setExplorationMessage] = useState('')
+  const [marketMessage, setMarketMessage] = useState('')
+  const [explorationVictory, setExplorationVictory] = useState(false)
+  const [explorationMessage, setExplorationMessage] = useState('')
   useEffect(() => localStorage.setItem('mordheim-ledger', JSON.stringify(data)), [data])
   const active = data.bands.find(b => b.id === selected) || data.bands[0]
   const totalWarriors = useMemo(() => data.bands.reduce((n,b) => n + b.warriors.length, 0), [data])
@@ -31,7 +34,11 @@ export default function App() {
   const addBand = () => { if (!bandName.trim()) return; const b: Warband = {id:uid(),name:bandName.trim(),faction,gold:500,rating:0,warriors:[],stash:[]}; setData(d=>({...d,bands:[...d.bands,b]})); setSelected(b.id); setBandName('') }
   const addWarrior = () => { if (!active || !warriorName.trim()) return; patchBand(active.id,{warriors:[...active.warriors,{id:uid(),name:warriorName.trim(),type:warriorType,xp:0,wounds:1,status:'In salute'}]}); setWarriorName('') }
   const buyEquipment = (item: typeof equipment[number]) => { if (!active) return; if (active.gold < item.cost) { setMarketMessage('Tesoro insufficiente per acquistare questo oggetto.'); return; } patchBand(active.id,{gold:active.gold-item.cost,stash:[...(active.stash || []),item.name]}); setMarketMessage(item.name+' aggiunto alla riserva della banda.'); }
-  const roll = (n:number) => setDice(Array.from({length:n},()=>Math.floor(Math.random()*6)+1))\n  const eligibleHeroes = active ? active.warriors.filter(w => ['Capitano','Eroe'].includes(w.type) && w.status !== 'Fuori combattimento').length : 0\n  const explorationTotal = dice.reduce((sum,value)=>sum+value,0)\n  const explorationStones = explorationTotal<=0?0:explorationTotal<=5?1:explorationTotal<=11?2:explorationTotal<=17?3:explorationTotal<=24?4:explorationTotal<=30?5:explorationTotal<=35?6:7\n  const resolveExploration = () => { if (!active) return; const count = Math.min(6,eligibleHeroes+(explorationVictory?1:0)); if (count===0) { setExplorationMessage('Servono almeno un Eroe disponibile o il dado bonus vittoria.'); return; } const results=Array.from({length:count},()=>Math.floor(Math.random()*6)+1); const total=results.reduce((a,b)=>a+b,0); const stones=total<=5?1:total<=11?2:total<=17?3:total<=24?4:total<=30?5:total<=35?6:7; const entry: Exploration={id:uid(),date:new Date().toLocaleDateString('it-IT'),bandName:active.name,dice:results,total,stones,victoryBonus:explorationVictory}; setDice(results); setData(d=>({...d,explorations:[entry,...(d.explorations||[])]})); setExplorationMessage('Esplorazione registrata: '+stones+' pietre di Malapietra.'); }
+  const roll = (n:number) => setDice(Array.from({length:n},()=>Math.floor(Math.random()*6)+1))
+  const eligibleHeroes = active ? active.warriors.filter(w => ['Capitano','Eroe'].includes(w.type) && w.status !== 'Fuori combattimento').length : 0
+  const explorationTotal = dice.reduce((sum,value)=>sum+value,0)
+  const explorationStones = explorationTotal<=0?0:explorationTotal<=5?1:explorationTotal<=11?2:explorationTotal<=17?3:explorationTotal<=24?4:explorationTotal<=30?5:explorationTotal<=35?6:7
+  const resolveExploration = () => { if (!active) return; const count = Math.min(6,eligibleHeroes+(explorationVictory?1:0)); if (count===0) { setExplorationMessage('Servono almeno un Eroe disponibile o il dado bonus vittoria.'); return; } const results=Array.from({length:count},()=>Math.floor(Math.random()*6)+1); const total=results.reduce((a,b)=>a+b,0); const stones=total<=5?1:total<=11?2:total<=17?3:total<=24?4:total<=30?5:total<=35?6:7; const entry: Exploration={id:uid(),date:new Date().toLocaleDateString('it-IT'),bandName:active.name,dice:results,total,stones,victoryBonus:explorationVictory}; setDice(results); setData(d=>({...d,explorations:[entry,...(d.explorations||[])]})); setExplorationMessage('Esplorazione registrata: '+stones+' pietre di Malapietra.'); }
   const exportData = () => { const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='mordheim-campagna.json'; a.click(); URL.revokeObjectURL(a.href) }
   const addGame = () => { if(!opponent.trim()) return; setData(d=>({...d,games:[{id:uid(),date:new Date().toLocaleDateString('it-IT'),opponent,result,notes},...d.games]})); setOpponent('');setNotes('') }
   const addChronicle = () => { if(chronicle.trim()) {setData(d=>({...d,chronicle:[chronicle.trim(),...d.chronicle]}));setChronicle('')} }
