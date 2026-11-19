@@ -20,11 +20,14 @@ Sito: https://nicola2751.github.io/mordheim-campaign-manager/
 - Registro guerrieri, PE, ferite, stati e equipaggiamento individuale.
 - Limite generale di sei Eroi incluso il Capitano e avviso per bande sotto i tre guerrieri.
 - Armeria con acquisto di oggetti comuni e ricerca degli oggetti rari tramite 2D6.
-- Registro dei tentativi di ricerca per singolo Eroe.
+- Registro dei tentativi di ricerca: un solo tentativo per Eroe nella stessa fase post-partita.
+- Gestione dei gruppi Truppa, assegnazione e restituzione dell'equipaggiamento, vendita degli oggetti usati a metà prezzo.
+- Sequenza guidata delle dieci fasi post-partita, con completamento manuale delle fasi non ancora automatizzate.
 - Esplorazione con dadi per gli Eroi disponibili, bonus vittoria, limite di sei dadi e conversione del totale in Malapietra.
 - Inventario di Malapietra e vendita con prezzo per pietra configurabile.
 - Registro partite, assegnazione PE di sopravvivenza e bonus banda svantaggiata.
 - Ferite gravi: tiro di sopravvivenza della Truppa e tiro D66 degli Eroi con annotazione manuale dell'esito.
+- Validazione strutturale dei backup JSON prima dell'importazione, inclusi gli identificativi duplicati e i tiri del mercato.
 - Cronaca, esportazione e importazione dei dati JSON.
 
 ## Regole e limiti
