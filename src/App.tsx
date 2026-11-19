@@ -137,7 +137,9 @@ export default function App() {
     const current = warrior.equipment || []
     const category = item?.category
     const meleeCount = current.filter(name => equipment.find(x => x.name === name)?.category === 'Mischia').length
-    const rangedCount = current.filter(name => ['Tiro','Armi da fuoco'].includes(equipment.find(x => x.name === name)?.category || '')).length
+    const rangedItems = current.filter(name => ['Tiro','Armi da fuoco'].includes(equipment.find(x => x.name === name)?.category || ''))
+    const pistolCount = rangedItems.filter(name => ['Pistola','Pistola da duello'].includes(name)).length
+    const rangedCount = rangedItems.filter(name => equipment.find(x => x.name === name)?.category === 'Tiro' || !['Pistola','Pistola da duello'].includes(name)).length + Math.ceil(pistolCount / 2)
     if (category === 'Mischia' && meleeCount >= 2) { setMarketMessage('Limite raggiunto: massimo due armi da mischia oltre al pugnale gratuito.'); return }
     if (['Tiro','Armi da fuoco'].includes(category || '') && rangedCount >= 2) { setMarketMessage('Limite raggiunto: massimo due armi da tiro.'); return }
     patchBand(active.id,{stash:active.stash?.filter((_,i)=>i!==stashIndex),warriors:active.warriors.map(w=>w.id===warriorId?{...w,equipment:[...current,itemName]}:w)})
