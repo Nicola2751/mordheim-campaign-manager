@@ -124,7 +124,6 @@ export default function App() {
   }
   const buyEquipment = (item: typeof equipment[number]) => {
     if (!active) return
-    if (active.gold < item.cost) { setMarketMessage('Tesoro insufficiente per acquistare questo oggetto.'); return }
     const rarityMatch = item.rarity.match(/Raro\s*(\d+)/i)
     if (rarityMatch) {
       const heroes = active.warriors.filter(w=>['Capitano','Eroe'].includes(w.type)&&w.status!=='Fuori combattimento')
@@ -140,10 +139,12 @@ export default function App() {
       const record:MarketSearch={id:uid(),date:today,bandId:active.id,gameId:latestGame.id,heroId:hero.id,heroName:hero.name,itemName:item.name,roll,rarity,success}
       setData(d=>{ const searches=[record,...(d.marketSearches||[])]; const eligibleHeroIds=active.warriors.filter(w=>['Capitano','Eroe'].includes(w.type)&&w.status!=='Fuori combattimento').map(w=>w.id); const phaseComplete=eligibleHeroIds.length>0&&eligibleHeroIds.every(heroId=>searches.some(x=>x.gameId===latestGame.id&&x.heroId===heroId)); return {...d,marketSearches:searches,games:d.games.map(g=>g.id===latestGame.id&&phaseComplete?{...g,postGameSteps:Array.from(new Set([...(g.postGameSteps||[]),5]))}:g)} })
       if (!success) { setMarketMessage(hero.name+': 2D6 = '+roll+'. Ricerca fallita (necessario '+rarity+').'); return }
+      if (active.gold < item.cost) { setMarketMessage(hero.name+': 2D6 = '+roll+'. '+item.name+' trovato, ma non acquistato: tesoreria insufficiente ('+item.cost+' CO necessari).'); return }
       patchBand(active.id,{gold:active.gold-item.cost,stash:[...(active.stash||[]),item.name]})
       setMarketMessage(hero.name+': 2D6 = '+roll+'. '+item.name+' trovato e acquistato per '+item.cost+' CO.')
       return
     }
+    if (active.gold < item.cost) { setMarketMessage('Tesoro insufficiente per acquistare questo oggetto.'); return }
     patchBand(active.id,{gold:active.gold-item.cost,stash:[...(active.stash || []),item.name]})
     setMarketMessage(item.name+' aggiunto alla riserva della banda.')
   }
