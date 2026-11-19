@@ -1,6 +1,6 @@
 # Mordheim Campaign Manager
 
-Web app in italiano per tenere traccia di bande, guerrieri, partite ed eventi di una campagna di Mordheim.
+Web app in italiano per la gestione locale di una campagna di Mordheim.
 
 ## Avvio locale
 Richiede Node.js 20 o superiore.
@@ -10,18 +10,25 @@ npm install
 npm run dev
 ```
 
-## Pubblicazione su GitHub Pages
-Il workflow in `.github/workflows/deploy.yml` pubblica automaticamente il progetto a ogni push su `main`. In GitHub, apri **Settings → Pages** e imposta **Build and deployment → Source: GitHub Actions**.
+## Pubblicazione
+Il workflow GitHub Actions pubblica automaticamente su GitHub Pages a ogni push su `main`.
 
 Sito: https://nicola2751.github.io/mordheim-campaign-manager/
 
-## Dati
-La prima versione salva i dati nel localStorage del browser. Usa **Esporta JSON** per fare una copia di sicurezza o trasferire i dati manualmente. La sincronizzazione tra dispositivi non è ancora attiva.
+## Funzioni attuali
+- Creazione bande, gestione tesoreria e valore banda.
+- Registro guerrieri, PE, ferite, stati e equipaggiamento individuale.
+- Limite generale di sei Eroi incluso il Capitano e avviso per bande sotto i tre guerrieri.
+- Armeria con acquisto di oggetti comuni e ricerca degli oggetti rari tramite 2D6.
+- Registro dei tentativi di ricerca per singolo Eroe.
+- Esplorazione con dadi per gli Eroi disponibili, bonus vittoria, limite di sei dadi e conversione del totale in Malapietra.
+- Inventario di Malapietra e vendita con prezzo per pietra configurabile.
+- Registro partite, assegnazione PE di sopravvivenza e bonus banda svantaggiata.
+- Ferite gravi: tiro di sopravvivenza della Truppa e tiro D66 degli Eroi con annotazione manuale dell'esito.
+- Cronaca, esportazione e importazione dei dati JSON.
 
-## Funzioni
-- Creazione e gestione bande
-- Registro guerrieri, esperienza e ferite
-- Gestione tesoreria
-- Registro partite e cronaca
-- Tiri di dadi D6
-- Esportazione dei dati in JSON
+## Regole e limiti
+I calcoli automatizzati riflettono solo le regole del Tomo 1 effettivamente trascritte e verificate durante lo sviluppo. Le tabelle D66 degli Eroi, gli avanzamenti dettagliati, le restrizioni di equipaggiamento specifiche per fazione, le disponibilità e i costi variabili, gli Avventurieri speciali e le regole del secondo tomo richiedono ancora verifica sui manuali completi. Dove il regolamento non è stato verificato, l'app lascia l'esito o il valore all'inserimento dell'utente anziché inventarlo.
+
+## Dati e privacy
+I dati sono salvati nel localStorage del browser e non vengono sincronizzati automaticamente tra dispositivi. Usa **Esporta JSON** per creare una copia di sicurezza e **Importa JSON** per ripristinarla. Conserva sempre una copia del file esportato.
