@@ -181,7 +181,7 @@ export default function App() {
     const quantity = Number(sellStones)
     const price = Number(stonePrice)
     if (!Number.isInteger(quantity)||quantity<1||quantity>(active.wyrdstone||0)||!Number.isInteger(price)||price<0) { setExplorationMessage('Inserisci una quantità intera disponibile e un prezzo intero non negativo.'); return }
-    patchBand(active.id,{wyrdstone:(active.wyrdstone||0)-quantity,gold:active.gold+quantity*price})
+    setData(d=>({...d,bands:d.bands.map(b=>b.id===active.id?{...b,wyrdstone:(b.wyrdstone||0)-quantity,gold:b.gold+quantity*price}:b),games:d.games.map(g=>g.id===d.games.find(x=>x.bandId===active.id)?.id?{...g,postGameSteps:Array.from(new Set([...(g.postGameSteps||[]),3]))}:g)}))
     setExplorationMessage('Vendute '+quantity+' pietre per '+(quantity*price)+' CO.')
   }
   const adjustGold = () => {
@@ -222,7 +222,7 @@ export default function App() {
   const eligibleHeroes = active ? active.warriors.filter(w => ['Capitano','Eroe'].includes(w.type) && w.status !== 'Fuori combattimento').length : 0
   const explorationTotal = dice.reduce((sum,value)=>sum+value,0)
   const explorationStones = explorationTotal<=0?0:explorationTotal<=5?1:explorationTotal<=11?2:explorationTotal<=17?3:explorationTotal<=24?4:explorationTotal<=30?5:explorationTotal<=35?6:7
-  const resolveExploration = () => { if (!active) return; const latestGame = data.games.find(g=>g.bandId===active.id); if (!latestGame) { setExplorationMessage('Registra prima la partita: l’esplorazione si effettua nella fase post-partita.'); return; } if ((data.explorations||[]).some(e=>e.gameId===latestGame.id)) { setExplorationMessage('L’esplorazione per l’ultima partita registrata è già stata effettuata.'); return; } const count = Math.min(6,eligibleHeroes+(explorationVictory?1:0)); if (count===0) { setExplorationMessage('Servono almeno un Eroe disponibile o il dado bonus vittoria.'); return; } const results=Array.from({length:count},()=>Math.floor(Math.random()*6)+1); const total=results.reduce((a,b)=>a+b,0); const stones=total<=5?1:total<=11?2:total<=17?3:total<=24?4:total<=30?5:total<=35?6:7; const entry: Exploration={id:uid(),date:new Date().toLocaleDateString('it-IT'),bandId:active.id,gameId:latestGame.id,bandName:active.name,dice:results,total,stones,victoryBonus:explorationVictory}; setDice(results); setData(d=>({...d,explorations:[entry,...(d.explorations||[])],bands:d.bands.map(b=>b.id===active.id?{...b,wyrdstone:(b.wyrdstone||0)+stones}:b)})); setExplorationVictory(false); setExplorationMessage('Esplorazione registrata: '+stones+' pietre di Malapietra.'); }
+  const resolveExploration = () => { if (!active) return; const latestGame = data.games.find(g=>g.bandId===active.id); if (!latestGame) { setExplorationMessage('Registra prima la partita: l’esplorazione si effettua nella fase post-partita.'); return; } if ((data.explorations||[]).some(e=>e.gameId===latestGame.id)) { setExplorationMessage('L’esplorazione per l’ultima partita registrata è già stata effettuata.'); return; } const count = Math.min(6,eligibleHeroes+(explorationVictory?1:0)); if (count===0) { setExplorationMessage('Servono almeno un Eroe disponibile o il dado bonus vittoria.'); return; } const results=Array.from({length:count},()=>Math.floor(Math.random()*6)+1); const total=results.reduce((a,b)=>a+b,0); const stones=total<=5?1:total<=11?2:total<=17?3:total<=24?4:total<=30?5:total<=35?6:7; const entry: Exploration={id:uid(),date:new Date().toLocaleDateString('it-IT'),bandId:active.id,gameId:latestGame.id,bandName:active.name,dice:results,total,stones,victoryBonus:explorationVictory}; setDice(results); setData(d=>({...d,explorations:[entry,...(d.explorations||[])],games:d.games.map(g=>g.id===latestGame.id?{...g,postGameSteps:Array.from(new Set([...(g.postGameSteps||[]),2]))}:g),bands:d.bands.map(b=>b.id===active.id?{...b,wyrdstone:(b.wyrdstone||0)+stones}:b)})); setExplorationVictory(false); setExplorationMessage('Esplorazione registrata: '+stones+' pietre di Malapietra.'); }
   const exportData = () => { const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='mordheim-campagna.json'; a.click(); URL.revokeObjectURL(a.href) }
   const recoverLocalData = () => {
     if (!recoveryData) return
@@ -247,6 +247,7 @@ export default function App() {
     URL.revokeObjectURL(url)
   }
   const underdogBonus = (difference:number) => difference<=50?0:difference<=75?1:difference<=100?2:difference<=150?3:difference<=300?4:5
+  const completePostGamePhase = (gameId:string, phaseIndex:number) => { setData(d=>({...d,games:d.games.map(g=>{ if(g.id!==gameId)return g; const done=g.postGameSteps||[]; return done.includes(phaseIndex)?g:{...g,postGameSteps:[...done,phaseIndex]} })})) }
   const applyPostGameExperience = () => {
     if (!active) { setPostGameMessage('Seleziona prima la banda.'); return }
     const game = data.games.find(g=>g.bandId===active.id)
@@ -255,7 +256,7 @@ export default function App() {
     const bonus = game.xpBonus ?? 0
     const eligible = active.warriors.filter(w=>w.status!=='Fuori combattimento' && w.earnsXp!==false)
     if (!eligible.length) { setPostGameMessage('Nessun guerriero sopravvissuto disponibile per ricevere PE.'); return }
-    setData(d=>({...d,bands:d.bands.map(b=>b.id===active.id?{...b,warriors:b.warriors.map(w=>w.status!=='Fuori combattimento' && w.earnsXp!==false?{...w,xp:w.xp+1+bonus}:w)}:b),games:d.games.map(g=>g.id===game.id?{...g,xpAwarded:true}:g)}))
+    setData(d=>({...d,bands:d.bands.map(b=>b.id===active.id?{...b,warriors:b.warriors.map(w=>w.status!=='Fuori combattimento' && w.earnsXp!==false?{...w,xp:w.xp+1+bonus}:w)}:b),games:d.games.map(g=>g.id===game.id?{...g,xpAwarded:true,postGameSteps:Array.from(new Set([...(g.postGameSteps||[]),1]))}:g)}))
     setPostGameMessage('Assegnati '+(1+bonus)+' PE a '+eligible.length+' guerrieri sopravvissuti e abilitati (1 PE sopravvivenza + '+bonus+' bonus svantaggio).')
   }
   const markNextPostGamePhase = (gameId:string) => {
