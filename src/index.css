@@ -11,3 +11,5 @@
 .backup-tools{display:flex;gap:8px;align-items:center}.import-label{position:relative;display:inline-flex;align-items:center;cursor:pointer}.import-label input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
 
 .roster-warning{padding:9px 12px;border-left:2px solid #a8793e;background:#241d14;color:#c5a36d;font-size:11px;line-height:1.5}
+
+.danger{border:1px solid #8f493d;background:#2a1714;color:#e0a092;padding:9px 12px;cursor:pointer;font-size:10px;letter-spacing:.4px}.danger:hover{background:#48211b;border-color:#c16b58}
