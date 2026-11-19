@@ -4,7 +4,7 @@ import { equipment } from './data/equipment'
 type Warrior = { id: string; name: string; type: string; xp: number; wounds: number; status: string; equipment?: string[]; injuryRoll?: number; injuryResult?: string }
 type Warband = { id: string; name: string; faction: string; gold: number; rating: number; warriors: Warrior[]; stash?: string[]; wyrdstone?: number }
 type Exploration = { id: string; date: string; bandName: string; dice: number[]; total: number; stones: number; victoryBonus: boolean }
-type MarketSearch = { id:string; date:string; bandId:string; heroName:string; itemName:string; roll:number; rarity:number; success:boolean }
+type MarketSearch = { id:string; date:string; bandId:string; heroId:string; heroName:string; itemName:string; roll:number; rarity:number; success:boolean }
 type Campaign = { bands: Warband[]; games: { id: string; date: string; opponent: string; result: string; notes: string; bandId?: string; xpBonus?: number; xpAwarded?: boolean }[]; chronicle: string[]; explorations: Exploration[]; marketSearches: MarketSearch[] }
 const starter: Campaign = { bands: [], games: [], chronicle: [], explorations: [], marketSearches: [] }
 const uid = () => Math.random().toString(36).slice(2, 10)
@@ -59,11 +59,11 @@ export default function App() {
       const hero = heroes.find(w=>w.id===marketHero) || heroes[0]
       if (!hero) { setMarketMessage('Serve un Eroe disponibile per cercare oggetti rari.'); return }
       const today = new Date().toLocaleDateString('it-IT')
-      if ((data.marketSearches||[]).some(x=>x.bandId===active.id&&x.heroName===hero.name&&x.itemName===item.name&&x.date===today)) { setMarketMessage(hero.name+' ha già tentato di trovare '+item.name+' oggi.'); return }
+      if ((data.marketSearches||[]).some(x=>x.bandId===active.id&&x.heroId===hero.id&&x.itemName===item.name&&x.date===today)) { setMarketMessage(hero.name+' ha già tentato di trovare '+item.name+' oggi.'); return }
       const roll = Math.floor(Math.random()*6)+1 + Math.floor(Math.random()*6)+1
       const rarity = Number(rarityMatch[1])
       const success = roll>=rarity
-      const record:MarketSearch={id:uid(),date:today,bandId:active.id,heroName:hero.name,itemName:item.name,roll,rarity,success}
+      const record:MarketSearch={id:uid(),date:today,bandId:active.id,heroId:hero.id,heroName:hero.name,itemName:item.name,roll,rarity,success}
       setData(d=>({...d,marketSearches:[record,...(d.marketSearches||[])]}))
       if (!success) { setMarketMessage(hero.name+': 2D6 = '+roll+'. Ricerca fallita (necessario '+rarity+').'); return }
       patchBand(active.id,{gold:active.gold-item.cost,stash:[...(active.stash||[]),item.name]})
