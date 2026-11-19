@@ -99,8 +99,8 @@ export default function App() {
     const beforeIds = new Set(before.map(w=>w.id))
     const afterIds = new Set(after.map(w=>w.id))
     const rows:{id:string;name:string;kind:string;details:string}[] = []
-    after.filter(w=>!beforeIds.has(w.id)).forEach(w=>rows.push({id:w.id,name:w.name,kind:'Ingresso',details:'Presente nella seconda partita'}))
-    before.filter(w=>!afterIds.has(w.id)).forEach(w=>rows.push({id:w.id,name:w.name,kind:'Uscita',details:'Non presente nella seconda partita'}))
+    after.filter(w=>!beforeIds.has(w.id)).forEach(w=>rows.push({id:w.id,name:w.name,kind:'Ingresso',details:'Tipo: '+w.type+(w.groupName?' · Gruppo: '+w.groupName:'')+' · Presente nella seconda partita'}))
+    before.filter(w=>!afterIds.has(w.id)).forEach(w=>rows.push({id:w.id,name:w.name,kind:'Uscita',details:'Tipo: '+w.type+(w.groupName?' · Gruppo: '+w.groupName:'')+' · Non presente nella seconda partita'}))
     before.filter(w=>afterIds.has(w.id)).forEach(old=>{
       const next=after.find(w=>w.id===old.id)!
       const changes:string[]=[]
