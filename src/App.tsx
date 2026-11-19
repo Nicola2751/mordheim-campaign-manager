@@ -143,7 +143,7 @@ export default function App() {
     if (category === 'Mischia' && meleeCount >= 2) { setMarketMessage('Limite raggiunto: massimo due armi da mischia oltre al pugnale gratuito.'); return }
     if (['Tiro','Armi da fuoco'].includes(category || '') && rangedCount >= 2) { setMarketMessage('Limite raggiunto: massimo due armi da tiro.'); return }
     patchBand(active.id,{stash:active.stash?.filter((_,i)=>i!==stashIndex),warriors:active.warriors.map(w=>w.id===warriorId?{...w,equipment:[...current,itemName]}:w)})
-    setEquipmentSelection(v=>({...v,[warriorId]:''}))
+    setEquipmentSelection({})
     setMarketMessage(itemName+' assegnato a '+warrior.name+'.')
   }
   const unequipItem = (warriorId:string, itemIndex:number) => {
@@ -154,6 +154,7 @@ export default function App() {
     const itemName=current[itemIndex]
     if (!itemName) return
     patchBand(active.id,{stash:[...(active.stash||[]),itemName],warriors:active.warriors.map(w=>w.id===warriorId?{...w,equipment:current.filter((_,i)=>i!==itemIndex)}:w)})
+    setEquipmentSelection({})
     setMarketMessage(itemName+' restituito alla riserva.')
   }
   const sellUsedItem = (itemName:string, source:'stash'|'warrior', warriorId?:string, itemIndex?:number) => {
@@ -164,6 +165,7 @@ export default function App() {
     if (source==='stash') {
       if (itemIndex===undefined || active.stash?.[itemIndex]!==itemName) return
       patchBand(active.id,{stash:active.stash.filter((_,i)=>i!==itemIndex),gold:active.gold+value})
+      setEquipmentSelection({})
     } else {
       const warrior = active.warriors.find(w=>w.id===warriorId)
       if (!warrior || itemIndex===undefined || warrior.equipment?.[itemIndex]!==itemName) return
