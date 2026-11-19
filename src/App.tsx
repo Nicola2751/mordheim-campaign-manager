@@ -26,7 +26,7 @@ const isCampaignBackup = (value: unknown): value is Campaign => {
   return true
 }
 const uid = () => Math.random().toString(36).slice(2, 10)
-const read = (): Campaign => { try { const saved: unknown = JSON.parse(localStorage.getItem('mordheim-ledger') || 'null'); if (!saved) return starter; if (!isCampaignBackup(saved)) return starter; return { ...starter, ...saved, explorations: (saved.explorations || []).map((e: Exploration) => ({...e, bandId: e.bandId || saved.bands.find((b: Warband) => b.name === e.bandName)?.id})), marketSearches: saved.marketSearches || [] } } catch { return starter } }
+const read = (): Campaign => {\n  try {\n    const raw = localStorage.getItem('mordheim-ledger')\n    if (!raw) return starter\n    const saved: unknown = JSON.parse(raw)\n    if (!isCampaignBackup(saved)) {\n      // Preserve invalid data before the initial React effect writes the fallback state.\n      localStorage.setItem('mordheim-ledger-recovery', raw)\n      return starter\n    }\n    return { ...starter, ...saved, explorations: (saved.explorations || []).map((e: Exploration) => ({...e, bandId: e.bandId || saved.bands.find((b: Warband) => b.name === e.bandName)?.id})), marketSearches: saved.marketSearches || [] }\n  } catch {\n    return starter\n  }\n}
 
 export default function App() {
   const [data, setData] = useState<Campaign>(read)
