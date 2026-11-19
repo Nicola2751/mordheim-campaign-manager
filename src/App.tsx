@@ -42,7 +42,7 @@ export default function App() {
   const buyEquipment = (item: typeof equipment[number]) => {
     if (!active) return
     if (active.gold < item.cost) { setMarketMessage('Tesoro insufficiente per acquistare questo oggetto.'); return }
-    const rarityMatch = item.rarity.match(/Raro\\s*(\\d+)/i)
+    const rarityMatch = item.rarity.match(/Raro\s*(\d+)/i)
     if (rarityMatch) {
       const heroes = active.warriors.filter(w=>['Capitano','Eroe'].includes(w.type)&&w.status!=='Fuori combattimento')
       const hero = heroes.find(w=>w.id===marketHero) || heroes[0]
