@@ -31,6 +31,7 @@ const isCampaignBackup = (value: unknown): value is Campaign => {
   if (value.economyLedger !== undefined && !uniqueIds(value.economyLedger)) return false
   const bandIds = new Set(value.bands.map((b: Warband) => b.id))
   const gameIds = new Set(value.games.map((g: Campaign['games'][number]) => g.id))
+  if (value.games.some((g: Campaign['games'][number]) => g.eligibleXpWarriorIds !== undefined && g.warriorSnapshot !== undefined && g.eligibleXpWarriorIds.some(id => !g.warriorSnapshot!.some(w => w.id === id)))) return false
   if (value.games.some((g: Campaign['games'][number]) => g.bandId !== undefined && !bandIds.has(g.bandId))) return false
   if ((value.explorations || []).some((e: Exploration) => (e.bandId !== undefined && !bandIds.has(e.bandId)) || (e.gameId !== undefined && (!gameIds.has(e.gameId) || (value.games as Campaign['games']).find(g => g.id === e.gameId)?.bandId !== e.bandId)))) return false
   if ((value.marketSearches || []).some((x: MarketSearch) => !bandIds.has(x.bandId) || (x.gameId !== undefined && !gameIds.has(x.gameId)))) return false
