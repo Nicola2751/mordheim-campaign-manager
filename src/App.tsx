@@ -28,6 +28,7 @@ const isCampaignBackup = (value: unknown): value is Campaign => {
    const explorationGameIds = (value.explorations || []).filter((e: Exploration) => e.gameId !== undefined).map((e: Exploration) => e.gameId)
    if (new Set(explorationGameIds).size !== explorationGameIds.length) return false
   if (value.marketSearches !== undefined && !uniqueIds(value.marketSearches)) return false
+  if (value.economyLedger !== undefined && !uniqueIds(value.economyLedger)) return false
   const bandIds = new Set(value.bands.map((b: Warband) => b.id))
   const gameIds = new Set(value.games.map((g: Campaign['games'][number]) => g.id))
   if (value.games.some((g: Campaign['games'][number]) => g.bandId !== undefined && !bandIds.has(g.bandId))) return false
@@ -35,6 +36,7 @@ const isCampaignBackup = (value: unknown): value is Campaign => {
   if ((value.marketSearches || []).some((x: MarketSearch) => !bandIds.has(x.bandId) || (x.gameId !== undefined && !gameIds.has(x.gameId)))) return false
   const gamesById = new Map((value.games as Campaign['games']).map(g => [g.id, g]))
   if ((value.marketSearches || []).some((x: MarketSearch) => x.gameId !== undefined && gamesById.get(x.gameId)?.bandId !== x.bandId)) return false
+  if ((value.economyLedger || []).some((x: EconomyEntry) => !bandIds.has(x.bandId) || (x.gameId !== undefined && (!gameIds.has(x.gameId) || gamesById.get(x.gameId)?.bandId !== x.bandId)))) return false
   const searchAttempts = (value.marketSearches || []).filter((x: MarketSearch) => x.gameId !== undefined).map((x: MarketSearch) => x.gameId + ':' + x.heroId)
   if (new Set(searchAttempts).size !== searchAttempts.length) return false
   return true
