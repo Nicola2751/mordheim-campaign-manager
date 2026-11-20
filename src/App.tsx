@@ -186,11 +186,11 @@ export default function App() {
     if (!active) return
     const rarityMatch = item.rarity.match(/Raro\s*(\d+)/i)
     if (rarityMatch) {
-      const heroes = active.warriors.filter(w=>['Capitano','Eroe'].includes(w.type)&&w.status!=='Fuori combattimento'&&(!latestGame.warriorSnapshot||latestGame.warriorSnapshot.some(snapshot=>snapshot.id===w.id)))
-      const hero = heroes.find(w=>w.id===marketHero) || heroes[0]
-      if (!hero) { setMarketMessage('Serve un Eroe disponibile per cercare oggetti rari.'); return }
       const latestGame = currentGame
       if (!latestGame) { setMarketMessage('Registra prima la partita: la ricerca degli oggetti rari si effettua nella fase post-partita.'); return }
+      const heroes = active.warriors.filter(w=>['Capitano','Eroe'].includes(w.type)&&w.status!=='Fuori combattimento'&&(!latestGame.warriorSnapshot||latestGame.warriorSnapshot.some(snapshot=>snapshot.id===w.id)))
+      const hero = heroes.find(w=>w.id===marketHero) || heroes[0]
+      if (!hero) { setMarketMessage('Serve un Eroe disponibile che abbia partecipato alla partita per cercare oggetti rari.'); return }
       const today = new Date().toLocaleDateString('it-IT')
       if ((data.marketSearches||[]).some(x=>x.bandId===active.id&&x.gameId===latestGame.id&&x.heroId===hero.id)) { setMarketMessage(hero.name+' ha già effettuato il suo tentativo di ricerca in questa fase post-partita.'); return }
       const roll = Math.floor(Math.random()*6)+1 + Math.floor(Math.random()*6)+1
