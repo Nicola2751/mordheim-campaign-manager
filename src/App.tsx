@@ -186,7 +186,7 @@ export default function App() {
     if (!active) return
     const rarityMatch = item.rarity.match(/Raro\s*(\d+)/i)
     if (rarityMatch) {
-      const heroes = active.warriors.filter(w=>['Capitano','Eroe'].includes(w.type)&&w.status!=='Fuori combattimento')
+      const heroes = active.warriors.filter(w=>['Capitano','Eroe'].includes(w.type)&&w.status!=='Fuori combattimento'&&(!latestGame.warriorSnapshot||latestGame.warriorSnapshot.some(snapshot=>snapshot.id===w.id)))
       const hero = heroes.find(w=>w.id===marketHero) || heroes[0]
       if (!hero) { setMarketMessage('Serve un Eroe disponibile per cercare oggetti rari.'); return }
       const latestGame = currentGame
@@ -197,7 +197,7 @@ export default function App() {
       const rarity = Number(rarityMatch[1])
       const success = roll>=rarity
       const record:MarketSearch={id:uid(),date:today,bandId:active.id,gameId:latestGame.id,heroId:hero.id,heroName:hero.name,itemName:item.name,roll,rarity,success}
-      setData(d=>{ const searches=[record,...(d.marketSearches||[])]; const eligibleHeroIds=active.warriors.filter(w=>['Capitano','Eroe'].includes(w.type)&&w.status!=='Fuori combattimento').map(w=>w.id); const phaseComplete=eligibleHeroIds.length>0&&eligibleHeroIds.every(heroId=>searches.some(x=>x.gameId===latestGame.id&&x.heroId===heroId)); return {...d,marketSearches:searches,games:d.games.map(g=>g.id===latestGame.id&&phaseComplete?{...g,postGameSteps:Array.from(new Set([...(g.postGameSteps||[]),5]))}:g)} })
+      setData(d=>{ const searches=[record,...(d.marketSearches||[])]; const eligibleHeroIds=active.warriors.filter(w=>['Capitano','Eroe'].includes(w.type)&&w.status!=='Fuori combattimento'&&(!latestGame.warriorSnapshot||latestGame.warriorSnapshot.some(snapshot=>snapshot.id===w.id))).map(w=>w.id); const phaseComplete=eligibleHeroIds.length>0&&eligibleHeroIds.every(heroId=>searches.some(x=>x.gameId===latestGame.id&&x.heroId===heroId)); return {...d,marketSearches:searches,games:d.games.map(g=>g.id===latestGame.id&&phaseComplete?{...g,postGameSteps:Array.from(new Set([...(g.postGameSteps||[]),5]))}:g)} })
       if (!success) { setMarketMessage(hero.name+': 2D6 = '+roll+'. Ricerca fallita (necessario '+rarity+').'); return }
       if (active.gold < item.cost) { setMarketMessage(hero.name+': 2D6 = '+roll+'. '+item.name+' trovato, ma non acquistato: tesoreria insufficiente ('+item.cost+' CO necessari).'); return }
       setData(d=>({...d,bands:d.bands.map(b=>b.id===active.id?{...b,gold:b.gold-item.cost,stash:[...(b.stash||[]),item.name]}:b),economyLedger:[logEconomy(active.id,'Acquisto raro',item.name,-item.cost,0,latestGame.id),...(d.economyLedger||[])]}))
