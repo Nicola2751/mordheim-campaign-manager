@@ -206,7 +206,7 @@ export default function App() {
       return
     }
     if (active.gold < item.cost) { setMarketMessage('Tesoro insufficiente per acquistare questo oggetto.'); return }
-    setData(d=>({...d,bands:d.bands.map(b=>b.id===active.id?{...b,gold:b.gold-item.cost,stash:[...(b.stash||[]),item.name]}:b),economyLedger:[logEconomy(active.id,'Acquisto',item.name,-item.cost,0,currentGame?.id),...(d.economyLedger||[])]}))
+    setData(d=>({...d,bands:d.bands.map(b=>b.id===active.id?{...b,gold:b.gold-item.cost,stash:[...(b.stash||[]),item.name]}:b),economyLedger:[logEconomy(active.id,'Acquisto',item.name,-item.cost),...(d.economyLedger||[])]}))
     setMarketMessage(item.name+' aggiunto alla riserva della banda.')
   }
   const equipItem = (warriorId:string, stashIndex:number) => {
@@ -245,12 +245,12 @@ export default function App() {
     const value = item.cost / 2
     if (source==='stash') {
       if (itemIndex===undefined || active.stash?.[itemIndex]!==itemName) return
-      setData(d=>({...d,bands:d.bands.map(b=>b.id===active.id?{...b,stash:b.stash!.filter((_,i)=>i!==itemIndex),gold:b.gold+value}:b),economyLedger:[logEconomy(active.id,'Vendita usato',itemName,value,0,currentGame?.id),...(d.economyLedger||[])]}))
+      setData(d=>({...d,bands:d.bands.map(b=>b.id===active.id?{...b,stash:b.stash!.filter((_,i)=>i!==itemIndex),gold:b.gold+value}:b),economyLedger:[logEconomy(active.id,'Vendita usato',itemName,value),...(d.economyLedger||[])]}))
       setEquipmentSelection({})
     } else {
       const warrior = active.warriors.find(w=>w.id===warriorId)
       if (!warrior || itemIndex===undefined || warrior.equipment?.[itemIndex]!==itemName) return
-      setData(d=>({...d,bands:d.bands.map(b=>b.id===active.id?{...b,warriors:b.warriors.map(w=>w.id===warriorId?{...w,equipment:(w.equipment||[]).filter((_,i)=>i!==itemIndex)}:w),gold:b.gold+value}:b),economyLedger:[logEconomy(active.id,'Vendita usato',itemName,value,0,currentGame?.id),...(d.economyLedger||[])]}))
+      setData(d=>({...d,bands:d.bands.map(b=>b.id===active.id?{...b,warriors:b.warriors.map(w=>w.id===warriorId?{...w,equipment:(w.equipment||[]).filter((_,i)=>i!==itemIndex)}:w),gold:b.gold+value}:b),economyLedger:[logEconomy(active.id,'Vendita usato',itemName,value),...(d.economyLedger||[])]}))
     }
     setMarketMessage(itemName+' venduto per '+value+' CO (metà del prezzo di acquisto).')
   }
@@ -269,7 +269,7 @@ export default function App() {
     if (!goldReason.trim()) { setPostGameMessage('Inserisci una causale per il movimento.'); return }
     if (active.gold+delta<0) { setPostGameMessage('Tesoreria insufficiente: la spesa supera le CO disponibili.'); return }
     const kind=delta>0?'Entrata manuale':'Uscita manuale'
-    setData(d=>({...d,bands:d.bands.map(b=>b.id===active.id?{...b,gold:b.gold+delta}:b),economyLedger:[logEconomy(active.id,kind,goldReason.trim(),delta,0,currentGame?.id),...(d.economyLedger||[])]}))
+    setData(d=>({...d,bands:d.bands.map(b=>b.id===active.id?{...b,gold:b.gold+delta}:b),economyLedger:[logEconomy(active.id,kind,goldReason.trim(),delta),...(d.economyLedger||[])]}))
     setPostGameMessage((delta>0?'Entrata':'Uscita')+' registrata: '+Math.abs(delta)+' CO · '+goldReason.trim()+'.')
     setGoldDelta('0'); setGoldReason('')
   }
