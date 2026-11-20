@@ -149,10 +149,11 @@ export default function App() {
   const logEconomy = (bandId:string, kind:string, description:string, goldDelta:number, wyrdstoneDelta=0, gameId?:string):EconomyEntry => ({id:uid(),date:new Date().toLocaleDateString('it-IT'),bandId,kind,description,goldDelta,wyrdstoneDelta,...(gameId?{gameId}:{})})
   const addBand = () => { if (!bandName.trim()) return; const b: Warband = {id:uid(),name:bandName.trim(),faction,gold:500,rating:0,warriors:[],stash:[]}; setData(d=>({...d,bands:[...d.bands,b],economyLedger:[logEconomy(b.id,'Fondo iniziale','Dotazione iniziale della banda',500),...(d.economyLedger||[])]})); setSelected(b.id); setEquipmentSelection({}); setInjuryDrafts({}); setMarketHero(''); setMarketMessage(''); setDice([]); setExplorationVictory(false); setExplorationMessage(''); setBandName('') }
   const deleteBand = (band: Warband) => {
-    if (!window.confirm('Vuoi davvero cancellare la banda “'+band.name+'”? Verranno eliminati anche il suo registro partite, le esplorazioni e i tentativi di mercato. Questa operazione non può essere annullata.')) return
-    setData(d=>({...d,bands:d.bands.filter(b=>b.id!==band.id),games:d.games.filter(g=>g.bandId!==band.id),explorations:d.explorations.filter(e=>e.bandId ? e.bandId!==band.id : e.bandName!==band.name),marketSearches:d.marketSearches.filter(x=>x.bandId!==band.id)}))
+    if (!window.confirm('Vuoi davvero cancellare la banda “'+band.name+'”? Verranno eliminati anche il suo registro partite, le esplorazioni, i tentativi di mercato e i movimenti contabili. Questa operazione non può essere annullata.')) return
+    setData(d=>({...d,bands:d.bands.filter(b=>b.id!==band.id),games:d.games.filter(g=>g.bandId!==band.id),explorations:d.explorations.filter(e=>e.bandId ? e.bandId!==band.id : e.bandName!==band.name),marketSearches:d.marketSearches.filter(x=>x.bandId!==band.id),economyLedger:(d.economyLedger||[]).filter(x=>x.bandId!==band.id)}))
     setSelected(current=>current===band.id?'':current)
-    setEquipmentSelection({}); setInjuryDrafts({}); setMarketHero(''); setMarketMessage('')
+    setSelectedGameId(''); setEquipmentSelection({}); setInjuryDrafts({}); setMarketHero(''); setMarketMessage(''); setDice([]); setExplorationVictory(false); setExplorationMessage('')
+
     setPostGameMessage('Banda “'+band.name+'” cancellata.')
   }
   const archiveWarrior = (warriorId:string, reason:string) => {
