@@ -152,7 +152,7 @@ export default function App() {
     if (!window.confirm('Vuoi davvero cancellare la banda “'+band.name+'”? Verranno eliminati anche il suo registro partite, le esplorazioni, i tentativi di mercato e i movimenti contabili. Questa operazione non può essere annullata.')) return
     setData(d=>({...d,bands:d.bands.filter(b=>b.id!==band.id),games:d.games.filter(g=>g.bandId!==band.id),explorations:d.explorations.filter(e=>e.bandId ? e.bandId!==band.id : e.bandName!==band.name),marketSearches:d.marketSearches.filter(x=>x.bandId!==band.id),economyLedger:(d.economyLedger||[]).filter(x=>x.bandId!==band.id)}))
     setSelected(current=>current===band.id?'':current)
-    setSelectedGameId(''); setEquipmentSelection({}); setInjuryDrafts({}); setMarketHero(''); setMarketMessage(''); setDice([]); setExplorationVictory(false); setExplorationMessage('')
+    setSelectedGameId(''); setCompareGameA(''); setCompareGameB(''); setEquipmentSelection({}); setInjuryDrafts({}); setMarketHero(''); setMarketMessage(''); setDice([]); setExplorationVictory(false); setExplorationMessage('')
 
     setPostGameMessage('Banda “'+band.name+'” cancellata.')
   }
